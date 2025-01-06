@@ -1,0 +1,86 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class PongGame extends JPanel implements ActionListener, KeyListener {
+    private int ballX = 160, ballY = 120, ballXDir = 2, ballYDir = 2;
+    private int paddle1Y = 100, paddle2Y = 100;
+    private final int PADDLE_WIDTH = 10, PADDLE_HEIGHT = 60, BALL_SIZE = 15;
+    private Timer timer;
+
+    public PongGame() {
+        timer = new Timer(5, this);
+        timer.start();
+        setFocusable(true);
+        addKeyListener(this);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, getWidth(), getHeight());
+
+        g.setColor(Color.WHITE);
+        g.fillRect(10, paddle1Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        g.fillRect(getWidth() - 20, paddle2Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        g.fillOval(ballX, ballY, BALL_SIZE, BALL_SIZE);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        ballX += ballXDir;
+        ballY += ballYDir;
+
+        if (ballY < 0 || ballY > getHeight() - BALL_SIZE) {
+            ballYDir = -ballYDir;
+        }
+
+        if (ballX < 20 && ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT) {
+            ballXDir = -ballXDir;
+        } else if (ballX > getWidth() - 35 && ballY > paddle2Y && ballY < paddle2Y + PADDLE_HEIGHT) {
+            ballXDir = -ballXDir;
+        } else if (ballX < 0 || ballX > getWidth() - BALL_SIZE) {
+            ballX = 160;
+            ballY = 120;
+        }
+
+        repaint();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_W:
+                if (paddle1Y > 0) paddle1Y -= 10;
+                break;
+            case KeyEvent.VK_S:
+                if (paddle1Y < getHeight() - PADDLE_HEIGHT) paddle1Y += 10;
+                break;
+            case KeyEvent.VK_UP:
+                if (paddle2Y > 0) paddle2Y -= 10;
+                break;
+            case KeyEvent.VK_DOWN:
+                if (paddle2Y < getHeight() - PADDLE_HEIGHT) paddle2Y += 10;
+                break;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Pong Game");
+        PongGame game = new PongGame();
+        frame.add(game);
+        frame.setSize(400, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
